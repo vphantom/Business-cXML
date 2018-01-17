@@ -1,11 +1,14 @@
 !Build/
 .last_cover_stats
-/META.yml
-/META.json
+.lwpcookies
+pod2htm*.tmp
+/META.*
 /MYMETA.*
 *.o
 *.pm.tdy
 *.bs
+Business-cXML-*
+Business-cXML-*.tar.gz
 
 # Devel::Cover
 cover_db/

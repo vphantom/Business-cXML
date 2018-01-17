@@ -1,0 +1,27 @@
+Changes
+LICENSE.txt
+lib/Business/cXML/Message/PunchOutOrder.pm
+lib/Business/cXML/Utils.pm
+lib/Business/cXML/Address.pm
+lib/Business/cXML/Contact.pm
+lib/Business/cXML/Amount.pm
+lib/Business/cXML/Transport.pm
+lib/Business/cXML/Response/PunchOutSetup.pm
+lib/Business/cXML/Description.pm
+lib/Business/cXML/Request/PunchOutSetup.pm
+lib/Business/cXML/Object.pm
+lib/Business/cXML/Carrier.pm
+lib/Business/cXML/Transmission.pm
+lib/Business/cXML/ShipTo.pm
+lib/Business/cXML/Address/Number.pm
+lib/Business/cXML/Address/Postal.pm
+lib/Business/cXML/Credential.pm
+lib/Business/cXML/ItemIn.pm
+lib/Business/cXML.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
