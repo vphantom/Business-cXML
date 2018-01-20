@@ -15,8 +15,9 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => '0',
     },
     BUILD_REQUIRES => {
-        'Test::More' => '0',
-		  'Test::Deep' => '0',
+        'Test::More'  => '0',
+		  'Test::Deep'  => '0',
+		  'File::Slurp' => '0',
     },
     PREREQ_PM => {
 		'Clone'              => '0.31',

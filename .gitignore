@@ -9,6 +9,7 @@ pod2htm*.tmp
 *.bs
 Business-cXML-*
 Business-cXML-*.tar.gz
+/test/
 
 # Devel::Cover
 cover_db/
