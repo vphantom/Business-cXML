@@ -8,6 +8,8 @@ use Test::Deep;
 #use File::Slurp;
 
 use XML::LibXML;
+XML::LibXML->new()->load_catalog('t/xml-catalog/catalog.xml');
+
 use XML::LibXML::Ferry;
 
 # We cover:
