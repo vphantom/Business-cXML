@@ -29,6 +29,7 @@ package Business::cXML::Transmission;
 use Business::cXML::Credential;
 use Business::cXML::Utils qw(current_datetime cxml_timestamp);
 use XML::LibXML;
+use Clone qw(clone);
 use DateTime;
 use HTML::Entities;
 use MIME::Base64;
@@ -81,7 +82,6 @@ sub new {
 		xml_root    => undef,
 		xml_payload => undef,
 		payload     => undef,
-		error       => undef,
 		timestamp   => cxml_timestamp($now),
 		epoch       => $now->strftime('%s'),
 		hostname    => hostname,
@@ -109,6 +109,9 @@ sub new {
 		$input = decode_base64($input) unless ($input =~ /^\s*</);
 		eval {
 			$self->{xml_doc} = ($doc = XML::LibXML->load_xml(string => $input));
+		};
+		return [ 400, $@ ] if $@;
+		eval {
 			$doc->validate();
 			$self->{xml_root} = ($doc = $doc->documentElement);
 		};
@@ -156,7 +159,7 @@ sub new {
 	$self->{to}     = Business::cXML::Credential->new('To')     unless defined $self->{to};
 	$self->{sender} = Business::cXML::Credential->new('Sender') unless defined $self->{sender};
 
-	return $self->{error} ? [400, $self->{error}] : $self;
+	return $self;
 }
 
 sub _new_payload {
@@ -281,14 +284,13 @@ sub _valid_string {
 sub toString {
 	my ($self) = @_;
 
-	return $self->{string} if defined $self->{string};
+	return (undef, $self->{string}) if defined $self->{string};
 
 	$_->unbindNode() foreach ($self->{xml_root}->childNodes);  # Start from guaranteed empty doc
 
-	my $header = $self->{xml_root}->create('Header');  # Detached for now
 
 	unless ($self->is_response) {
-		$self->{xml_root}->add($header);
+		my $header = $self->{xml_root}->add('Header');
 		$header->add($self->{from}->to_node($header));
 		$header->add($self->{to}->to_node($header));
 		$self->{sender}->secret(undef) if $self->is_message;  # No SharedSecret in Message
@@ -346,14 +348,14 @@ sub freeze {
 	my ($self) = @_;
 	my $err;
 	my $str;
-	($err, $str) = $self->toString unless defined $self->{string};
-	$self->{string} = $str if defined $str;
+	($err, $str) = $self->toString;
+	$self->{string} = $str;
 	return ($err, $self->{string});
 }
 
 =item C<B<thaw>()>
 
-Destroy the internally stored results of L<i/toString()>.  Modifications to
+Destroy the internally stored results of L</toString()>.  Modifications to
 internal data will once again produce changes in what L</toString()> returns.
 
 =cut
@@ -375,7 +377,7 @@ sub reply_to {
 
 	$self->{type} = $req->{type};
 
-	$self->{inreplyto} = $req->{id};
+	$self->inreplyto($req->{id});
 
 	$self->sender->copy($req->to);
 	$self->sender->contact(undef);
@@ -402,15 +404,18 @@ case of C<from()>, sets both C<from> and C<sender> objects, therefore if you
 need to override this behavior, be sure to set C<sender> after C<from>.
 
 Note that you could also pass a single L<Business::cXML::Credential> object,
-in which case it would replace the current one outright.
+in which case it would replace the current one outright.  In the case of
+C<from()>, note that the object reference will be given to C<sender> intact
+and a clone will be copied into C<from()>.
 
 =cut
 
 sub from {
 	my ($self, %props) = @_;
-	if (@_ == 2 && ref($_[1])) {
-		$self->{from} = ($self->{sender} = $_[1]);
+	if (ref($_[1])) {
+		$self->{from} = clone($self->{sender} = $_[1]);
 	} elsif (%props) {
+		$self->{sender}->set(%props);
 		$self->{from}->set(%props);
 	};
 	return $self->{from};
@@ -418,7 +423,7 @@ sub from {
 
 sub to {
 	my ($self, %props) = @_;
-	if (@_ == 2 && ref($_[1])) {
+	if (ref($_[1])) {
 		$self->{to} = $_[1];
 	} elsif (%props) {
 		$self->{to}->set(%props);
@@ -428,7 +433,7 @@ sub to {
 
 sub sender {
 	my ($self, %props) = @_;
-	if (@_ == 2 && ref($_[1])) {
+	if (ref($_[1])) {
 		$self->{sender} = $_[1];
 	} elsif (%props) {
 		$self->{sender}->set(%props);
@@ -529,7 +534,7 @@ sub lang {
 	my ($self, $lang) = @_;
 	if (defined $lang) {
 		$self->{lang} = $lang;
-		$self->{xml_root}->attr('xml:lang' => $lang) if defined $self->{xml_root};
+		$self->{xml_root}->attr('xml:lang' => $lang);
 	};
 	return $self->{lang};
 }

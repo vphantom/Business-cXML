@@ -36,7 +36,7 @@ use constant NODENAME => 'Sender';
 use constant PROPERTIES => (
 	_note     => undef,
 	domain    => 'NetworkId',
-	id        => undef,
+	id        => ' ',
 	secret    => undef,
 	useragent => undef,
 	type      => undef,
@@ -76,11 +76,11 @@ sub to_node {
 	my ($self, $doc) = @_;
 	my $node = $doc->create($self->{_nodeName});
 	my $cred = $node->add('Credential', undef, domain => $self->{domain}, type => $self->{type});
-	$cred->add('Identity', $self->{id}) if $self->{id};
+	$cred->add('Identity', $self->{id});
 	$cred->add('SharedSecret', $self->{secret}) if $self->{secret};
 	# UNIMPLEMENTED: DigitalSignature CredentialMac
 	if ($self->{_nodeName} eq 'Sender') {
-		$node->add('UserAgent', 'Business::cXML.pm ' . $Business::cXML::VERSION);
+		$node->add('UserAgent', $Business::cXML::USERAGENT);
 	} elsif (ref $self->{contact}) {
 		$node->add('Correspondent', undef, preferredLanguage => $self->{lang})
 			->add($self->{contact}->to_node($node))

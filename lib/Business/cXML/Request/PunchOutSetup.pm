@@ -53,7 +53,7 @@ use constant PROPERTIES => (
 	_ext_lastname   => undef,
 	_ext_uid        => undef,
 	operation       => 'create',
-	buyer_cookie    => undef,
+	buyer_cookie    => ' ',
 	checkout_url    => undef,
 	checkout_target => undef,
 	contacts        => [],
@@ -98,8 +98,8 @@ sub from_node {
 		# 1. Full name
 		# 2. First + last names
 		# 3. User ID is better than nothing
-		$self->{_ext_name} = $self->{_ext_firstName} . ' ' . $self->{_ext_lastName}
-			if !$self->{_ext_name} && $self->{_ext_firstName} && $self->{_ext_lastName};
+		$self->{_ext_name} = $self->{_ext_firstname} . ' ' . $self->{_ext_lastname}
+			if !$self->{_ext_name} && $self->{_ext_firstname} && $self->{_ext_lastname};
 		$self->{_ext_name} = $self->{_ext_uid}
 			unless $self->{_ext_name};
 		if ($self->{_ext_email} && $self->{_ext_name}) {
@@ -117,10 +117,10 @@ sub from_node {
 sub to_node {
 	my ($self, $doc) = @_;
 	my $node = $doc->create('PunchOutSetupRequest');
-	$node->{operation} = $self->{operation} if $self->{operation};
+	$node->{operation} = $self->{operation};
 
+	$node->add('BuyerCookie', $self->{buyer_cookie});
 	$node->add('Extrinsic', $self->{checkout_target}, name => 'ReturnFrame') if defined $self->{checkout_target};
-	$node->add('BuyerCookie', $self->{buyer_cookie}) if defined $self->{buyer_cookie};
 	$node->add('BrowserFormPost')->add('URL', $self->{checkout_url}) if defined $self->{checkout_url};
 	$node->add($_->to_node($node)) foreach (@{ $self->{contacts} });
 	$node->add($self->{shipto}->to_node($node)) if defined $self->{shipto};
@@ -134,7 +134,7 @@ Mandatory, one of: C<create> (default), C<inspect>, C<edit>, C<source>
 
 =item C<B<buyer_cookie>>
 
-Optional
+Mandatory
 
 =item C<B<checkout_url>>
 

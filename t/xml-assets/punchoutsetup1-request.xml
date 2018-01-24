@@ -20,9 +20,10 @@
 			<UserAgent>Test Service</UserAgent>
 		</Sender>
 	</Header>
-	<Request>
+	<Request deploymentMode="production">
 		<PunchOutSetupRequest operation="create">
 			<BuyerCookie>buyer1234</BuyerCookie>
+			<Extrinsic name="ReturnFrame">_returnFrame</Extrinsic>
 			<BrowserFormPost>
 				<URL>https://example.com/punchout_return</URL>
 			</BrowserFormPost>

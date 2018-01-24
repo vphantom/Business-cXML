@@ -23,26 +23,7 @@
 	<Request deploymentMode="test">
 		<PunchOutSetupRequest operation="create">
 			<BuyerCookie>buyer1234</BuyerCookie>
-			<Extrinsic name="UserEmail">1234@remotehost</Extrinsic>
-			<Extrinsic name="FirstName">John</Extrinsic>
-			<Extrinsic name="LastName">Smith</Extrinsic>
-			<BrowserFormPost>
-				<URL>https://example.com/punchout_return</URL>
-			</BrowserFormPost>
-			<ShipTo>
-				<Address addressID="1234567">
-					<Name xml:lang="en-US">John Smith</Name>
-					<PostalAddress>
-						<DeliverTo>John Smith</DeliverTo>
-						<Street>123 Main St.</Street>
-						<City>Metropolis</City>
-						<Municipality>N/A</Municipality>
-						<State>ON</State>
-						<PostalCode>H3C 3P3</PostalCode>
-						<Country isoCountryCode="CA">Canada</Country>
-					</PostalAddress>
-				</Address>
-			</ShipTo>
+			<Extrinsic name="FullName">John Smith</Extrinsic>
 		</PunchOutSetupRequest>
 	</Request>
 </cXML>

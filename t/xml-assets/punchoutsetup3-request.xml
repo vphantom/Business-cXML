@@ -24,8 +24,7 @@
 		<PunchOutSetupRequest operation="create">
 			<BuyerCookie>buyer1234</BuyerCookie>
 			<Extrinsic name="UserEmail">1234@remotehost</Extrinsic>
-			<Extrinsic name="FirstName">John</Extrinsic>
-			<Extrinsic name="LastName">Smith</Extrinsic>
+			<Extrinsic name="UserFullName">John Smith</Extrinsic>
 			<BrowserFormPost>
 				<URL>https://example.com/punchout_return</URL>
 			</BrowserFormPost>

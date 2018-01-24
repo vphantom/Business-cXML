@@ -110,14 +110,17 @@ use Business::cXML::Transmission;
 BEGIN {
 	our $VERSION = 'v0.5.2';
 	our $CXML_VERSION = '1.2.036';
+	our $USERAGENT = "Business::cXML.pm $VERSION";
 }
 
-our @EXPORT = qw(CXML_LOG_NOTHING CXML_LOG_ERR CXML_LOG_WARN CXML_LOG_INFO);
+our @EXPORT = qw(CXML_LOG_NOTHING CXML_LOG_ERR CXML_LOG_ERROR CXML_LOG_WARN CXML_LOG_WARNING CXML_LOG_INFO);
 
 use constant {
 	CXML_LOG_NOTHING => 0,
 	CXML_LOG_ERR     => 1,
+	CXML_LOG_ERROR   => 1,
 	CXML_LOG_WARN    => 2,
+	CXML_LOG_WARNING => 2,
 	CXML_LOG_INFO    => 3,
 };
 
@@ -153,7 +156,9 @@ Subroutine, passed to L</sender_callback()>.
 
 =item B<log_level>
 
-One of: C<CXML_LOG_NOTHING>, C<CXML_LOG_ERR>, C<CXML_LOG_WARN> (default), C<CXML_LOG_INFO>
+One of: C<CXML_LOG_NOTHING> (default), C<CXML_LOG_ERR>, C<CXML_LOG_WARN>,
+C<CXML_LOG_INFO>.  Alternates C<CXML_LOG_ERROR> and C<CXML_LOG_WARNING> are
+also available.
 
 =item B<log_callback>
 
@@ -174,8 +179,8 @@ sub new {
 		local           => ($options{local} || ''),
 		remote          => ($options{remote} || undef),
 		secret          => ($options{secret} || undef),
-		sender_callback => ($options{sender_callback} || undef),
-		log_level       => ($options{log_level} || CXML_LOG_WARN),
+		sender_callback => undef,
+		log_level       => ($options{log_level} || CXML_LOG_NOTHING),
 		log_callback    => ($options{log_callback} || \&_log_default),
 		routes => {
 			Profile => {
@@ -184,6 +189,7 @@ sub new {
 		},
 	};
 	bless $self, $class;
+	$self->sender_callback($options{sender_callback}) if exists $options{sender_callback};
 	$self->on(%{ $options{handlers} }) if exists $options{handlers};
 	return $self;
 }
@@ -201,7 +207,7 @@ sub _handle_profile {
 	# UNIMPLEMENTED: service-level (outside Transaction blocks) options: service, attachments, changes, requestNames
 	# Possibly also: Locale (found in an example, but not in any documentation)
 	# There was no documentation about these in the cXML 1.2.036 PDF manual nor in the DTD comments.
-	foreach my $route (grep { $_ ne 'Profile' } keys (%{ $self->{routes} })) {
+	foreach my $route (keys (%{ $self->{routes} })) {
 		my $tx = $data->add('Transaction', undef, requestName => ($route . 'Request'));
 		$tx->add(URL => $self->{local});
 		foreach my $opt (grep { $_ ne '__handler' } keys (%{ $self->{routes}{$route} })) {
@@ -245,7 +251,7 @@ the payload itself.
 
 sub sender_callback {
 	my ($self, $callback) = @_;
-	$self->{sender_callback} = $callback;
+	$self->{sender_callback} = $callback if ref($callback) eq 'CODE';
 }
 
 =item C<B<log_callback>( I<$sub> )>
@@ -291,7 +297,7 @@ C<Request>, C<Response> and C<Message> transmissions.
 =cut
 
 sub _log_default {
-	my ($cxml, $level, $desc, $xml, $cxml) = @_;
+	my ($cxml, $level, $desc, $xml, $tx) = @_;
 	return unless $level <= $cxml->{log_level};
 	$level = ('error', 'warning', 'info')[$level-1];
 	# use Data::Dumper;
@@ -304,9 +310,9 @@ sub log_callback {
 	$self->{log_callback} = $callback;
 }
 
-sub _error   { my $l = shift; $l->{log_callback}->($l, CXML_LOG_ERR, @_); }
-sub _warning { my $l = shift; $l->{log_callback}->($l, CXML_LOG_WARN, @_); }
-sub _notice  { my $l = shift; $l->{log_callback}->($l, CXML_LOG_INFO, @_); }
+sub _error   { my $l = shift; $l->{log_callback}->($l, CXML_LOG_ERR,  @_); return undef; }
+sub _warning { my $l = shift; $l->{log_callback}->($l, CXML_LOG_WARN, @_); return undef; }
+sub _notice  { my $l = shift; $l->{log_callback}->($l, CXML_LOG_INFO, @_); return undef; }
 
 =item C<B<on>( I<%handlers> )>
 
@@ -377,24 +383,17 @@ sub process {
 	unless ($input) {
 		$self->_notice("process() ping-pong");
 		$res->status(200, "Pong!");
-
-		($err, $str) = $res->toString;
-		$self->_error("process(11): $err", $str, $res) if defined $err;
-		return $str;
+		return scalar($res->toString);
 	};
 
 	my $req = new Business::cXML::Transmission $input;
 
 	unless (defined blessed($req)) {
 		# We have an error status code
-		my $desc = $req->[0] == 406 ? "XML validation failure" : 'cXML traversal failure';
-		$desc .= ":\n" . $req->[1] if $req->[1];
+		my $desc = "XML validation failure:\n" . $req->[1];
 		$self->_warning("process(21) $desc", $input);
 		$res->status($req->[0], $desc);
-
-		($err, $str) = $res->toString;
-		$self->_error("process(22): $err", $str, $res) if defined $err;
-		return $str;
+		return scalar($res->toString);
 	};
 
 	$res->status(500, "Handler did not set a response status.");
@@ -408,10 +407,7 @@ sub process {
 		} else {
 			$self->_warning("process(31) sender validation failed", $input, $req);
 			$res->status(401, "Invalid sender.");
-
-			($err, $str) = $res->toString;
-			$self->_error("process(32): $err", $str, $res) if defined $err;
-			return $str;
+			return scalar($res->toString);
 		};
 	};
 
@@ -419,10 +415,7 @@ sub process {
 		my $desc = "Type '" . $req->type . "' is not implemented.";
 		$self->_warning("process(41) $desc", $input, $req);
 		$res->status(450, $desc);
-
-		($err, $str) = $res->toString;
-		$self->_error("process(42): $err", $str, $res) if defined $err;
-		return $str;
+		return scalar($res->toString);
 	};
 
 	$self->_notice("process() received request", $input, $req);
@@ -489,6 +482,7 @@ sub send {
 	$self->_notice("send() making HTTP request", $req, $obj);
 
 	my $ua = new LWP::UserAgent;
+	$ua->agent($Business::cXML::USERAGENT);
 	$ua->timeout(30);
 	my $res = $ua->post(
 		$self->{remote},
@@ -500,14 +494,12 @@ sub send {
 		my $msg = new Business::cXML::Transmission $res;
 		unless (defined blessed($msg)) {
 			# We have an error status code
-			$self->_warning('send(21) ' . ($msg->[0] == 406 ? 'response XML validation' : 'response cXML traversal') . ' failure', $res);
-			return undef;
+			return $self->_warning('send(21) ' . ($msg->[0] == 406 ? 'response XML validation' : 'response cXML traversal') . ' failure', $res);
 		};
 		$self->_notice("send() received HTTP response", $res, $msg);
 		return $msg;
 	} else {
-		$self->_warning("send(22) had network failure", $req, $obj);
-		return undef;
+		return $self->_warning("send(22) had network failure", $req, $obj);
 	};
 }
 
@@ -536,8 +528,8 @@ which allows you to trap logging events.
 =cut
 
 sub stringify {
-	my ($self, $msg) = @_;
-	my ($err, $str) = $msg->toForm;
+	my ($self, $msg, %args) = @_;
+	my ($err, $str) = $msg->toForm(%args);
 	$self->_error("stringify(): $err", $str, $msg) if defined $err;
 	return $str;
 }

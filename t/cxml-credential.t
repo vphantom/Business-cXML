@@ -33,7 +33,7 @@ cmp_deeply(
 		_nodeName => 'Sender',
 		_note     => undef,
 		domain    => 'NetworkId',
-		id        => undef,
+		id        => ' ',
 		secret    => undef,
 		useragent => undef,
 		type      => undef,
@@ -73,7 +73,7 @@ $a = Business::cXML::Credential->new($d);
 cmp_deeply($a->_nodeName, 'From', 'Loading from XML recognizes node name');
 cmp_deeply($a->to_node($d)->toHash, $d->toHash, 'Round-trip from XML back to XML is consistent');
 
-$d = XML::LibXML->load_xml(string => '<From><Credential domain="DUNS" type="real"><SharedSecret>pa$$word</SharedSecret></Credential><UserAgent>Ignore Bot</UserAgent></From>')->documentElement;
+$d = XML::LibXML->load_xml(string => '<From><Credential domain="DUNS" type="real"><Identity> </Identity><SharedSecret>pa$$word</SharedSecret></Credential><UserAgent>Ignore Bot</UserAgent></From>')->documentElement;
 $h = $d->toHash;
 delete $h->{UserAgent};
 cmp_deeply(Business::cXML::Credential->new($d)->to_node($d)->toHash, $h, 'XML round-trip for From without UserAgent');

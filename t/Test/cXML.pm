@@ -26,17 +26,29 @@ sub comparable {
 		$hash->{pid}         = 'pid';
 		$hash->{id}          = 'id';
 	} elsif (ref($hash) eq 'HASH') {
+
+		# cXML attributes to remove
 		delete $hash->{__attributes}{timestamp} if exists $hash->{__attributes}{timestamp};
 		delete $hash->{__attributes}{payloadID} if exists $hash->{__attributes}{payloadID};
-		delete $hash->{Request}->[0]->{__attributes}{deploymentMode}
-			if exists $hash->{Request}
-			&& exists $hash->{Request}->[0]->{__attributes}{deploymentMode}
-		;
+
+		# Header/Sender/UserAgent will differ
 		delete $hash->{Header}->[0]->{Sender}->[0]->{UserAgent}
 			if exists $hash->{Header}
 			&& exists $hash->{Header}->[0]->{Sender}
 			&& exists $hash->{Header}->[0]->{Sender}->[0]->{UserAgent}
 		;
+
+		# ProfileResponse attribute to remove, Transaction[] to sort
+		if (exists $hash->{Response}->[0]->{ProfileResponse}) {
+			my $res = $hash->{Response}->[0]->{ProfileResponse}->[0];
+			return $hash unless defined $res;
+
+			delete $res->{__attributes}{effectiveDate};
+			$res->{Transaction} = [
+				sort { $a->{__attributes}{requestName} cmp $b->{__attributes}{requestName} } @{ $res->{Transaction} }
+			];
+		};
+
 	};
 	return $hash;
 }
