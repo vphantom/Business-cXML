@@ -42,10 +42,10 @@ cmp_deeply(
 );
 
 sub _mylog {
-	my () = @_;
+	my (undef) = @_;
 }
 sub _test {
-	my () = @_;
+	my (undef) = @_;
 }
 $cxml = Business::cXML->new(
 	local           => 'local',
