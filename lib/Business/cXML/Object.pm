@@ -9,16 +9,21 @@ Business::cXML::Object - Generic cXML object
 	package Business::cXML::YourPackage;
 	use base qw(Business::cXML::Object);
 
+	use constant NODENAME => 'XMLNodeName';
+
 	use constant PROPERTIES => (
 		first_name => '',
 		last_name  => undef,
 		emails     => [],
+		phone      => undef,
 	);
 	# new(), first_name(), last_name() and emails() get/set methods will be provided automatically
 
 	# Optionally: an e-mail is actually a Something::Email object
+	# Even more optional: a phone is actually a Something::Number with "Phone" argument
 	use constant OBJ_PROPERTIES => (
 		emails => 'Something::Email',
+		phone  => [ 'Something::Number', 'Phone' ],
 	);
 
 =head1 DESCRIPTION
@@ -35,7 +40,10 @@ automatic property methods.
 
 Declare those properties which should be objects (or lists of objects) of a
 specific class in optional I<C<OBJ_PROPERTIES>> (in addition to
-I<C<PROPERTIES>>) to specify which class (see example in L</SYNOPSIS>).
+I<C<PROPERTIES>>) to specify which class (see example in L</SYNOPSIS>).  If
+the class is actually an arrayref, the first element will be considered the
+class name and all other elements will be passed as arguments to the class'
+C<new()> after the value hashref argument.
 
 I<C<NODENAME>> will be used in cases where C<_nodeName> cannot be
 inferred from context.
@@ -215,10 +223,20 @@ sub _getset {
 	my %obj_fields = $self->OBJ_PROPERTIES;
 
 	if (exists($obj_fields{$name}) && ref($val) eq 'HASH') {
-		my $file = $obj_fields{$name};
+		my @args;
+		my $class;
+		if (ref($obj_fields{$name}) eq 'ARRAY') {
+			@args = @{ $obj_fields{$name} };
+			$class = shift(@args);
+		} else {
+			$class = $obj_fields{$name};
+		};
+
+		unshift(@args, $val);
+		my $file = $class;
 		$file =~ s|::|/|g;
 		require "$file.pm";
-		$val = ($obj_fields{$name})->new($val);
+		$val = $class->new(@args);
 	};
 
 	if (@_ > 2) {

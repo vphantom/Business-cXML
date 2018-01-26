@@ -37,15 +37,23 @@ use constant {
 	CXML_POOM_STATUS_FINAL   => 2,
 };
 
+use constant NODENAME => 'PunchOutOrderMessage';
 use constant PROPERTIES => (
-	buyer_cookie      => '',
+	buyer_cookie      => ' ',
 	highest_operation => 'create',
-	status            => CXML_POOM_STATUS_FINAL,
+	status            => undef,
 	total             => undef,
 	shipto            => undef,
 	shipping          => undef,
 	tax               => undef,
 	items             => [],
+);
+use constant OBJ_PROPERTIES => (
+	total    => [ 'Business::cXML::Amount', 'Total'    ],
+	shipto   => 'Business::cXML::ShipTo',
+	shipping => [ 'Business::cXML::Amount', 'Shipping' ],
+	tax      => [ 'Business::cXML::Amount', 'Tax'      ],
+	items    => 'Business::cXML::ItemIn',
 );
 
 use Business::cXML::Amount;
@@ -66,7 +74,7 @@ sub from_node {
 			BuyerCookie                => 'buyer_cookie',
 			PunchOutOrderMessageHeader => {
 				operationAllowed  => 'highest_operation',
-				quoteStatus       => [ 'status', &_from_status ],
+				quoteStatus       => [ 'status', \&_from_status ],
 				SourcingStatus    => '__UNIMPLEMENTED',
 				Total             => [ 'total',    'Business::cXML::Amount' ],
 				ShipTo            => [ 'shipto',   'Business::cXML::ShipTo' ],
@@ -81,19 +89,22 @@ sub from_node {
 
 sub to_node {
 	my ($self, $doc) = @_;
-	my $node = $doc->create('PunchOutOrderMessage');
+	my $node = $doc->create($self->{_nodeName});
 
-	$node->add('BuyerCookie', $self->{buyer_cookie}) if defined $self->{buyer_cookie};
+	$node->add('BuyerCookie', $self->{buyer_cookie});
 
 	my $head = $node->add('PunchOutOrderMessageHeader', undef,
 		operationAllowed => $self->{highest_operation},
-		quoteStatus      => $self->{status},
 	);
-	$head->add($self->{total}->to_node($node))    if defined $self->{total};  # Invalid without it, but can't help at our level
+	$head->{quoteStatus} = ($self->is_final ? 'final' : 'pending') if defined $self->{status};
+
+	# UNIMPLEMENTED: SourcingStatus
+	$self->total({}) unless defined $self->{total};
+	$head->add($self->{total}->to_node($node));
 	$head->add($self->{shipto}->to_node($node))   if defined $self->{shipto};
 	$head->add($self->{shipping}->to_node($node)) if defined $self->{shipping};
 	$head->add($self->{tax}->to_node($node))      if defined $self->{tax};
-	# UNIMPLEMENTED: SourcingStatus SupplierOrderInfo
+	# UNIMPLEMENTED: SupplierOrderInfo
 
 	$node->add($_->to_node($node)) foreach (@{ $self->{items} });
 
@@ -105,18 +116,19 @@ sub to_node {
 =item C<B<is_final>( [I<$bool>] )>
 
 Respectively gets or sets whether the order is in pending or final status.
+There is no status at all by default.
 
 =cut
 
 sub is_pending {
 	my ($self, $bool) = @_;
-	my $self->{status} = CXML_POOM_STATUS_PENDING if $bool;
+	$self->{status} = CXML_POOM_STATUS_PENDING if $bool;
 	return $self->{status} == CXML_POOM_STATUS_PENDING;
 }
 
 sub is_final {
 	my ($self, $bool) = @_;
-	my $self->{status} = CXML_POOM_STATUS_FINAL if $bool;
+	$self->{status} = CXML_POOM_STATUS_FINAL if $bool;
 	return $self->{status} == CXML_POOM_STATUS_FINAL;
 }
 
@@ -126,12 +138,12 @@ Mandatory, cookie from original punch-out setup request
 
 =item C<B<highest_operation>>
 
-Mandatory, highest operation that we allow on this order.  One of: C<create>,
-C<inspect>, C<edit>
+Mandatory, highest operation that we allow on this order.  One of: C<create>
+(default), C<inspect>, C<edit>
 
 =item C<B<total>>
 
-Mandatory, L<Business::cXML::Amount> object of C<Total> type
+Mandatory, L<Business::cXML::Amount> object of type C<Total>
 
 =item C<B<shipto>>
 
@@ -144,7 +156,7 @@ tracking information)
 
 =item B<tax>
 
-Optional, L<Business::cXML::Amount> object of C<Tax> type
+Optional, L<Business::cXML::Amount> object of type C<Tax>
 
 =item C<B<items>[]>
 

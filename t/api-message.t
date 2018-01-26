@@ -16,7 +16,7 @@ use Business::cXML;
 use lib 't/';
 use Test::cXML qw(comparable);
 
-plan tests => 9;
+plan tests => 12;
 
 my $cxml = Business::cXML->new(
 #	log_level => CXML_LOG_WARNING,
@@ -26,11 +26,8 @@ sub _testify {
 	my ($msg) = @_;
 	$msg->from(id => 'remotehost', domain => 'TEST');
 	$msg->to(  id => 'localhost',  domain => 'TEST');
-	$msg->xml_payload->add('BuyerCookie', '12345678');
-	$msg->xml_payload->add('PunchOutOrderMessageHeader', undef,
-		operationAllowed => 'create',
-		quoteStatus      => 'final',
-	)->add('Total')->add('Money', '12.99', currency => 'CAD');
+	$msg->payload->buyer_cookie('12345678');
+	$msg->payload->items({});
 }
 
 my $msg = $cxml->new_message('PunchOutOrder');
@@ -51,6 +48,7 @@ cmp_deeply(
 $msg = $cxml->new_message();
 $msg->type('PunchOutOrder');
 _testify($msg);
+$b64 = ($cxml->stringify($msg) =~ s/^.*name="cxml-base64"\s+value="([^"]*)".*$/$1/sr);
 cmp_deeply(
 	comparable(XML::LibXML->load_xml(string => scalar(Business::cXML::Transmission->new($b64)->toString))),
 	comparable(XML::LibXML->load_xml(location => 't/xml-assets/punchoutorder-message.xml')),
@@ -74,5 +72,17 @@ cmp_deeply(
 	comparable(XML::LibXML->load_xml(string => scalar(Business::cXML::Transmission->new(scalar(read_file('t/xml-assets/punchoutorder3-message.xml')))->toString))),
 	comparable(XML::LibXML->load_xml(location => 't/xml-assets/punchoutorder3-message.xml')),
 	'XML round-trip with non-OK status is as expected'
+);
+
+$msg = $cxml->new_message('PunchOutOrder');
+$msg->payload->is_pending(1);
+ok($msg->payload->is_pending && !$msg->payload->is_final, 'Pending beats final status');
+$msg->payload->is_final(1);
+ok($msg->payload->is_final && !$msg->payload->is_pending, 'Final beats pending status');
+
+cmp_deeply(
+	comparable(XML::LibXML->load_xml(string => scalar(Business::cXML::Transmission->new(scalar(read_file('t/xml-assets/punchoutorder4-message.xml')))->toString))),
+	comparable(XML::LibXML->load_xml(location => 't/xml-assets/punchoutorder4-message.xml')),
+	'Full PunchOutOrderMessage XML round-trip as expected'
 );
 

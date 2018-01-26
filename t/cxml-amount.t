@@ -31,7 +31,7 @@ cmp_deeply(
 	noclass({
 		_nodeName       => 'Amount',
 		currency        => 'USD',
-		amount          => 0.00,
+		amount          => '0.00',
 		description     => undef,
 		type            => undef,
 		fees            => [],

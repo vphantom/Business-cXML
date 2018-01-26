@@ -51,7 +51,7 @@ sub from_node {
 
 sub to_node {
 	my ($self, $doc) = @_;
-	my $node = $doc->create('Description', $self->{full}, 'xml:lang' => $self->lang);
+	my $node = $doc->create($self->{_nodeName}, $self->{full}, 'xml:lang' => $self->lang);
 	$node->add('ShortName', $self->{short}) if defined $self->{short};
 	return $node;
 }

@@ -53,8 +53,8 @@ use constant PROPERTIES => (
 	postal => undef,
 );
 use constant OBJ_PROPERTIES => (
-	phone  => 'Business::cXML::Address::Number',
-	fax    => 'Business::cXML::Address::Number',
+	phone  => [ 'Business::cXML::Address::Number', 'Phone' ],
+	fax    => [ 'Business::cXML::Address::Number', 'Fax'   ],
 	postal => 'Business::cXML::Address::Postal',
 );
 

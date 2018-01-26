@@ -74,7 +74,7 @@ cmp_deeply(
 			extension    => undef,
 		}],
 		faxes => [{
-			_nodeName    => 'Phone',  # It will be forced only in Contact->to_node()
+			_nodeName    => 'Fax',
 			name         => undef,
 			country_iso  => 'US',
 			country_code => '1',

@@ -54,8 +54,8 @@ use constant PROPERTIES => (
 	postals => [],
 );
 use constant OBJ_PROPERTIES => (
-	phones  => 'Business::cXML::Address::Number',
-	faxes   => 'Business::cXML::Address::Number',
+	phones  => [ 'Business::cXML::Address::Number', 'Phone' ],
+	faxes   => [ 'Business::cXML::Address::Number', 'Fax'   ],
 	postals => 'Business::cXML::Address::Postal',
 );
 

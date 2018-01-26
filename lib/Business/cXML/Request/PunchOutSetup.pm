@@ -116,7 +116,7 @@ sub from_node {
 
 sub to_node {
 	my ($self, $doc) = @_;
-	my $node = $doc->create('PunchOutSetupRequest');
+	my $node = $doc->create($self->{_nodeName});
 	$node->{operation} = $self->{operation};
 
 	$node->add('BuyerCookie', $self->{buyer_cookie});

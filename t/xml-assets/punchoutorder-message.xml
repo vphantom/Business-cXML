@@ -22,11 +22,20 @@
 	<Message deploymentMode="production">
 		<PunchOutOrderMessage>
 			<BuyerCookie>12345678</BuyerCookie>
-			<PunchOutOrderMessageHeader operationAllowed="create" quoteStatus="final">
+			<PunchOutOrderMessageHeader operationAllowed="create">
 				<Total>
-					<Money currency="CAD">12.99</Money>
+					<Money currency="USD">0.00</Money>
 				</Total>
 			</PunchOutOrderMessageHeader>
+			<ItemIn quantity="0">
+				<ItemID><SupplierPartID></SupplierPartID></ItemID>
+				<ItemDetail>
+					<UnitPrice><Money currency="USD">0.00</Money></UnitPrice>
+					<Description xml:lang="en-US"></Description>
+					<UnitOfMeasure>EA</UnitOfMeasure>
+					<Classification domain="UNSPSC"></Classification>
+				</ItemDetail>
+			</ItemIn>
 		</PunchOutOrderMessage>
 	</Message>
 </cXML>

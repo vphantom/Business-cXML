@@ -67,7 +67,7 @@ sub from_node {
 
 sub to_node {
 	my ($self, $doc) = @_;
-	my $node = $doc->create('TransportInformation');
+	my $node = $doc->create($self->{_nodeName});
 	my $route = $node->add('Route', undef,
 		method    => $self->{method},
 		means     => $self->{means},

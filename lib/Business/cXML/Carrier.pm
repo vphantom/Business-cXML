@@ -10,7 +10,7 @@ Business::cXML::Carrier - cXML carrier identity
 
 =head1 DESCRIPTION
 
-Object representation of a cXML C<CarrierIdentifier>..
+Object representation of a cXML C<CarrierIdentifier>.
 
 =head1 METHODS
 
@@ -46,7 +46,7 @@ sub from_node {
 
 sub to_node {
 	my ($self, $doc) = @_;
-	return $doc->create('CarrierIdentifier', $self->{id}, domain => $self->{domain});
+	return $doc->create($self->{_nodeName}, $self->{id}, domain => $self->{domain});
 }
 
 =item C<B<domain>>

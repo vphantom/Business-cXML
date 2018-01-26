@@ -77,7 +77,7 @@ sub from_node {
 
 sub to_node {
 	my ($self, $doc) = @_;
-	my $node = $doc->create('TaxDetail', undef,
+	my $node = $doc->create($self->{_nodeName}, undef,
 		purpose        => $self->{purpose},
 		category       => $self->{category},
 		percentageRate => $self->{percent},

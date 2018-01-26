@@ -108,7 +108,7 @@ use Scalar::Util 'blessed';
 use Business::cXML::Transmission;
 
 BEGIN {
-	our $VERSION = 'v0.5.2';
+	our $VERSION = 'v0.6.0';
 	our $CXML_VERSION = '1.2.036';
 	our $USERAGENT = "Business::cXML.pm $VERSION";
 }

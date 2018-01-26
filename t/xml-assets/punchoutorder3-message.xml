@@ -23,7 +23,7 @@
 		<Status code="201" text="Accepted" xml:lang="en-US">We're all set</Status>
 		<PunchOutOrderMessage>
 			<BuyerCookie>12345678</BuyerCookie>
-			<PunchOutOrderMessageHeader operationAllowed="create" quoteStatus="final">
+			<PunchOutOrderMessageHeader operationAllowed="create">
 				<Total>
 					<Money currency="CAD">12.99</Money>
 				</Total>

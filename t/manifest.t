@@ -15,5 +15,9 @@ plan skip_all => "Test::CheckManifest $min_tcm required" if $@;
 ok_manifest({
 	exclude => [
 		'/.git/',
+		'/.travis.yml',
+		'/cover_db/',
+		'/test/',
+		'/Makefile.old',
 	],
 });

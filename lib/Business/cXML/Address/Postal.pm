@@ -61,7 +61,7 @@ sub from_node {
 
 sub to_node {
 	my ($self, $doc) = @_;
-	my $node = $doc->create('PostalAddress');
+	my $node = $doc->create($self->{_nodeName});
 	$node->{name} = $self->{name} if $self->{name};
 
 	$node->add('DeliverTo', $_) foreach (@{ $self->{delivertos} });

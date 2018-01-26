@@ -2,15 +2,18 @@
 
 =head1 NAME
 
-Business::cXML::ShipTo - cXML ship-to address
+Business::cXML::Characteristic - cXML product item characteristic
 
 =head1 SYNOPSIS
 
-	use Business::cXML::ShipTo;
+	use Business::cXML::Characteristic;
 
 =head1 DESCRIPTION
 
-Object representation of a cXML ship-to address with transport details.
+Object representation of a cXML C<Characteristic>.
+
+A group of one or more characteristics would specify a configurable product
+item (for example with colors, sizes, etc.)
 
 =head1 METHODS
 
@@ -27,61 +30,45 @@ See L<Business::cXML::Object/PROPERTY METHODS> for how the following operate.
 use 5.006;
 use strict;
 
-package Business::cXML::ShipTo;
+package Business::cXML::Characteristic;
 use base qw(Business::cXML::Object);
 
-use Business::cXML::Address;
-use Business::cXML::Carrier;
-use Business::cXML::Transport;
-use XML::LibXML::Ferry;
-
-use constant NODENAME => 'ShipTo';
+use constant NODENAME => 'Characteristic';
 use constant PROPERTIES => (
-	address    => Business::cXML::Address->new(),
-	carriers   => [],
-	transports => [],
+	domain => 'size',
+	value  => '',
+	code   => undef,
 );
-use constant OBJ_PROPERTIES => (
-	address    => 'Business::cXML::Address',
-	carriers   => 'Business::cXML::Carrier',
-	transports => 'Business::cXML::Transport',
-);
+
+use XML::LibXML::Ferry;
 
 sub from_node {
 	my ($self, $el) = @_;
-
-	$el->ferry($self, {
-			Address              => [ 'address',    'Business::cXML::Address'   ],
-			CarrierIdentifier    => [ 'carriers',   'Business::cXML::Carrier'   ],
-			TransportInformation => [ 'transports', 'Business::cXML::Transport' ],
-			IdReference          => '__UNIMPLEMENTED',
-		}
-	);
+	$el->ferry($self);
 }
 
 sub to_node {
 	my ($self, $doc) = @_;
-	my $node = $doc->create($self->{_nodeName});
-
-	$node->add($self->{address}->to_node($node));
-	$node->add($_->to_node($node)) foreach (@{ $self->{carriers} });
-	$node->add($_->to_node($node)) foreach (@{ $self->{transports} });
-	# UNIMPLEMENTED: IdReference*
-
-	return $node;
+	return $doc->create($self->{_nodeName}, undef,
+		domain => $self->{domain},
+		value  => $self->{value},
+		code   => $self->{code},
+	);
 }
 
-=item C<B<address>>
+=item C<B<domain>>
 
-Optional, L<Business::cXML::Address> object
+Mandatory, type of characteristic.  For example: C<size> (default),
+C<sizeCode>, C<color>, C<colorCode>, C<grade>, etc.
 
-=item C<B<carriers>[]>
+=item C<B<value>>
 
-Optional, L<Business::cXML::Carrier> objects
+Mandatory, value for the domain.  For example: a size C<70>.
 
-=item C<B<transports>[]>
+=item C<B<code>>
 
-Optional, L<Business::cXML::Transport> objects
+Optional, additional information such as currency code or unit of measure.
+For example, size 70 C<cm>.
 
 =back
 

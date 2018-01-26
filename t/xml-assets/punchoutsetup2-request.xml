@@ -30,7 +30,7 @@
 				<URL>https://example.com/punchout_return</URL>
 			</BrowserFormPost>
 			<ShipTo>
-				<Address addressID="1234567">
+				<Address>
 					<Name xml:lang="en-US">John Smith</Name>
 					<PostalAddress>
 						<DeliverTo>John Smith</DeliverTo>

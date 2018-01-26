@@ -104,10 +104,13 @@ use strict;
 package Business::cXML::Amount;
 use base qw(Business::cXML::Object);
 
+use Business::cXML::Amount::TaxDetail;
+use XML::LibXML::Ferry;
+
 use constant NODENAME => 'Amount';
 use constant PROPERTIES => (
 	currency        => 'USD',
-	amount          => 0.00,
+	amount          => '0.00',
 	description     => undef,
 	type            => undef,
 	fees            => [],
@@ -124,9 +127,6 @@ use constant OBJ_PROPERTIES => (
 	taxadj_details => 'Business::cXML::Amount',
 	description    => 'Business::cXML::Description',
 );
-
-use Business::cXML::Amount::TaxDetail;
-use XML::LibXML::Ferry;
 
 sub from_node {
 	my ($self, $el) = @_;

@@ -34,6 +34,7 @@ use strict;
 package Business::cXML::Response::PunchOutSetup;
 use base qw(Business::cXML::Object);
 
+use constant NODENAME => 'PunchOutSetupResponse';
 use constant PROPERTIES => (
 	url => '',
 );
@@ -49,7 +50,7 @@ sub from_node {
 
 sub to_node {
 	my ($self, $doc) = @_;
-	my $node = $doc->create('PunchOutSetupResponse');
+	my $node = $doc->create($self->{_nodeName});
 
 	$node->add('StartPage')->add('URL', $self->{url});
 
