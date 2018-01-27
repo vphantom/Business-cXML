@@ -48,6 +48,7 @@
 					<Money currency="CAD">0.05</Money>
 					<Description xml:lang="fr-CA">Taxes on the whole thing</Description>
 				</Tax>
+				<SupplierOrderInfo orderID="1234"/>
 			</PunchOutOrderMessageHeader>
 			<ItemIn quantity="1" openQuantity="2" promisedQuantity="3" lineNumber="1" parentLineNumber="0" itemType="item" compositeItemType="itemLevel" itemClassification="material">
 				<ItemID><SupplierPartID>SKU-1234</SupplierPartID></ItemID>

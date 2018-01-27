@@ -47,6 +47,7 @@ use constant PROPERTIES => (
 	shipping          => undef,
 	tax               => undef,
 	items             => [],
+	id                => undef,
 );
 use constant OBJ_PROPERTIES => (
 	total    => [ 'Business::cXML::Amount', 'Total'    ],
@@ -80,7 +81,10 @@ sub from_node {
 				ShipTo            => [ 'shipto',   'Business::cXML::ShipTo' ],
 				Shipping          => [ 'shipping', 'Business::cXML::Amount' ],
 				Tax               => [ 'tax',      'Business::cXML::Amount' ],
-				SupplierOrderInfo => '__UNIMPLEMENTED',
+				SupplierOrderInfo => {
+					orderID   => 'id',
+					orderDate => '__UNIMPLEMENTED',
+				},
 			},
 			ItemIn => [ 'items', 'Business::cXML::ItemIn' ],
 		}
@@ -104,7 +108,7 @@ sub to_node {
 	$head->add($self->{shipto}->to_node($node))   if defined $self->{shipto};
 	$head->add($self->{shipping}->to_node($node)) if defined $self->{shipping};
 	$head->add($self->{tax}->to_node($node))      if defined $self->{tax};
-	# UNIMPLEMENTED: SupplierOrderInfo
+	$head->add('SupplierOrderInfo', undef, orderID => $self->{id}) if defined $self->{id};
 
 	$node->add($_->to_node($node)) foreach (@{ $self->{items} });
 
@@ -161,6 +165,12 @@ Optional, L<Business::cXML::Amount> object of type C<Tax>
 =item C<B<items>[]>
 
 Optional, L<Business::cXML::ItemIn> objects
+
+=item C<B<id>>
+
+Optional, supplier sales order ID for this order, if one was created.  The
+buyer can later cancel the sales order by sending an C<OrderRequest> of type
+C<delete> that refers to this ID.
 
 =back
 
