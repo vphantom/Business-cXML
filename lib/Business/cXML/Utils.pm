@@ -14,7 +14,7 @@ Various utilities not specific to any one cXML module.
 
 =cut
 
-use 5.006;
+use 5.014;
 use strict;
 
 package Business::cXML::Utils;

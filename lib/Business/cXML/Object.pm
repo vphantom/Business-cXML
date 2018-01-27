@@ -50,7 +50,7 @@ inferred from context.
 
 =cut
 
-use 5.006;
+use 5.014;
 use strict;
 
 package Business::cXML::Object;

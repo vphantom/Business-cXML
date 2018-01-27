@@ -26,7 +26,7 @@ See L<Business::cXML::Object/COMMON METHODS>, plus the following:
 
 =cut
 
-use 5.006;
+use 5.014;
 use strict;
 
 package Business::cXML::Address::Number;

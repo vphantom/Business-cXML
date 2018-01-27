@@ -21,7 +21,7 @@ concern for manual processing is our L</payload()>.
 
 =cut
 
-use 5.006;
+use 5.014;
 use strict;
 
 package Business::cXML::Transmission;

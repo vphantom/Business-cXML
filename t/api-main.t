@@ -1,5 +1,5 @@
 #!perl -T
-use 5.006;
+use 5.014;
 use strict;
 use warnings;
 use Test::More;
@@ -11,11 +11,7 @@ use File::Slurp;
 use XML::LibXML;
 XML::LibXML->new()->load_catalog('t/xml-catalog/catalog.xml');
 
-#use XML::LibXML::Ferry;
 use Business::cXML;
-
-#use lib 't/';
-#use Test::cXML qw(comparable);
 
 plan tests => 10;
 

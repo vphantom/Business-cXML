@@ -1,11 +1,12 @@
 #!perl -T
-use 5.006;
+use 5.014;
 use strict;
 use warnings;
 use Test::More;
 
 unless ( $ENV{RELEASE_TESTING} ) {
     plan( skip_all => "Author tests not required for installation" );
+	 exit 0;
 }
 
 my $min_tcm = 0.9;
