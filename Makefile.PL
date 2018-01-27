@@ -15,11 +15,12 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => '0',
 	},
 	BUILD_REQUIRES => {
-		'Test::Deep'       => '0',
-		'Test::MockModule' => '0',
-		'Test::More'       => '0',
-		'Test::Trap'       => '0',
-		'File::Slurp'      => '0',
+		'Test::Deep'                  => '0',
+		'Test::MockModule'            => '0',
+		'Test::More'                  => '0',
+		'Test::Trap'                  => '0',
+		'File::Slurp'                 => '0',
+		'Pod::Coverage::CountParents' => '0',  # Not really, but I couldn't figure out how to avoid it
 	},
 	PREREQ_PM => {
 		'Clone'              => '0.31',
