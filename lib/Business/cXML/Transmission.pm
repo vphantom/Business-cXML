@@ -243,7 +243,7 @@ Optional, override submit button HTML with your own
 
 sub toForm {
 	my ($self, %args) = @_;
-	my $url = encode_entities($args{url});
+	my $url = encode_entities($args{url} || '');
 	my $submit = '<input type="submit">';
 	$submit = $args{submit_button} if exists $args{submit_button};
 	my $target = '';
