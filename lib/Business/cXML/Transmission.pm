@@ -166,7 +166,7 @@ sub _new_payload {
 	my ($self, $msg) = @_;
 	my $status;
 
-	$self->is_test(1) if ($msg->{deploymentMode} eq 'test');
+	$self->is_test(1) if (exists $msg->{deploymentMode} && $msg->{deploymentMode} eq 'test');
 	$self->{inreplyto} = $msg->{inReplyTo} if exists $msg->{inReplyTo};
 	# UNIMPLEMENTED Message/Request/Response: Id?
 
