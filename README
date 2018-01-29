@@ -26,6 +26,12 @@ perldoc command.
 If you find any bugs, please report them at:
 	https://github.com/vphantom/Business-cXML/issues
 
+## KNOWN BUGS
+
+Microsoft Windows is not currently supported and I don't have access to such
+an environment for testing.  See details in
+https://github.com/vphantom/Business-cXML/issues/1
+
 ## ACKNOWLEDGEMENTS
 
 Graph X Design Inc. https://www.gxd.ca/ sponsored this project.
