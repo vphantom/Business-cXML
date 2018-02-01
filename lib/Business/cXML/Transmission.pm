@@ -378,6 +378,7 @@ sub reply_to {
 	$self->{type} = $req->{type};
 
 	$self->inreplyto($req->{id});
+	$self->is_test($req->is_test);
 
 	$self->sender->copy($req->to);
 	$self->sender->contact(undef);
