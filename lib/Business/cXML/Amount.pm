@@ -169,6 +169,7 @@ sub to_node {
 		$node->add($_->to_node($node)) foreach (@{ $self->{fees} });
 	};
 
+	$self->description({}) if !defined($self->{description}) && $self->{_nodeName} =~ /^(Penalty|Shipping|Tax)$/;
 	$node->add($self->{description}->to_node($node))
 		if defined $self->{description}
 			&& $self->{_nodeName} =~ /^(AvailablePrice|Penalty|Shipping|SpecialHandlingAmount|Tax)$/

@@ -14,7 +14,7 @@ use XML::LibXML::Ferry;
 use Business::cXML::Amount;
 #use Business::cXML::Amount::TaxDetail;
 
-plan tests => 14;
+plan tests => 15;
 
 my $a;
 my $d;
@@ -152,6 +152,24 @@ cmp_deeply(
 	'Type and description ignored for a generic Amount'
 );
 
+## Conditional defaults
+#
 
-
-
+cmp_deeply(
+	Business::cXML::Amount->new('Tax', { amount => 4.95 })->to_node($d)->toHash,
+	noclass({
+		__attributes => {},
+		__text       => '',
+		Money => [{
+			__attributes => { currency => 'USD' },
+			__text       => '4.95',
+		}],
+		Description => [{
+			__attributes => {
+				'{http://www.w3.org/XML/1998/namespace}lang' => 'en-US',
+			},
+			__text => '',
+		}],
+	}),
+	'A Tax always includes a description'
+);
