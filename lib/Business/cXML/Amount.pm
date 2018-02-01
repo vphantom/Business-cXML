@@ -122,9 +122,9 @@ use constant PROPERTIES => (
 	region          => undef,
 );
 use constant OBJ_PROPERTIES => (
-	fees           => 'Business::cXML::Amount',
+	fees           => [ 'Business::cXML::Amount', 'Fee' ],
 	tax_details    => 'Business::cXML::Amount::TaxDetail',
-	taxadj_details => 'Business::cXML::Amount',
+	taxadj_details => [ 'Business::cXML::Amount', 'TaxAdjustmentDetail' ],
 	description    => 'Business::cXML::Description',
 );
 
