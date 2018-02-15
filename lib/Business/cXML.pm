@@ -416,12 +416,22 @@ sub process {
 
 	if (defined $self->{sender_callback}) {
 		$self->_trace("process(30) sender_callback...");
-		my $note = $self->{sender_callback}->($self, $req->{sender}, $req->{from});
+		my $note;
+		eval {
+			$note = $self->{sender_callback}->($self, $req->sender, $req->from);
+		};
+		if ($@) {
+			$self->_error("process(31) sender_callback crashed!!!", $@);
+			$res->status(500, "Sender validation encountered an irrecoverable error.");
+			($err, $str) = $res->toString;
+			$self->_error("process(32) $err", $str) if $err;
+			return $str;
+		};
 		if ($note) {
-			$self->_debug("process(32) sender_callback successful");
+			$self->_debug("process(33) sender_callback successful");
 			$req->sender->_note($note);
 		} else {
-			$self->_warning("process(33) sender validation failed", $input, $req);
+			$self->_warning("process(34) sender validation failed", $input, $req);
 			$res->status(401, "Invalid sender.");
 			($err, $str) = $res->toString;
 			$self->_error("process(35) $err", $str) if $err;
@@ -441,7 +451,10 @@ sub process {
 	eval {
 		$self->{routes}{$req->type}{__handler}->($self, $req, $res);
 	};
-	$self->_error("process(50) handler for type '" . $req->type . "' crashed!!!", $@) if $@;
+	if ($@) {
+		$self->_error("process(50) handler for type '" . $req->type . "' crashed!!!", $@);
+		$res->status(500, "Processing for type '" . $req->type . "' encountered an irrecoverable error.");
+	};
 
 	($err, $str) = $res->toString;
 	$self->_error("process(51): $err", $str, $res) if $err;
