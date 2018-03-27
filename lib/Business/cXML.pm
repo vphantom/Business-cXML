@@ -308,6 +308,7 @@ sub _log_default {
 	$level = ('error', 'warning', 'info', 'debug', 'trace')[$level-1];
 	# use Data::Dumper;
 	# print STDERR "cXML[$level]: ", $desc, " -- ", $xml, " -- ", Dumper($cxml), "\n";
+	$xml =~ s/>\s+</> </g;
 	print STDERR "cXML[$level]: ", $desc, " -- ", $xml, "\n";
 }
 
