@@ -1,6 +1,7 @@
 !Build/
 .last_cover_stats
 .lwpcookies
+.tags
 pod2htm*.tmp
 /META.*
 /MYMETA.*
