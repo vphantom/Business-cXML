@@ -1,8 +1,0 @@
-language:   perl
-perl:
-   - "5.14"
-   - "5.26"
-before_install:
-   cpanm --notest Devel::Cover::Report::Coveralls
-script:
-   perl Makefile.PL && make && cover -test -report coveralls
