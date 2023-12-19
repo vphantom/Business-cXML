@@ -1,4 +1,4 @@
-# Business-cXML v0.6.11
+# Business-cXML v0.6.12
 
 Perl implementation of cXML messaging.
 
@@ -36,7 +36,7 @@ Graph X Design Inc. https://www.gxd.ca/ sponsored this project.
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 Stéphane Lavergne
+Copyright (C) 2017-2023 Stéphane Lavergne
 
 This program is distributed under the MIT (X11) License:
 http://www.opensource.org/licenses/mit-license.php

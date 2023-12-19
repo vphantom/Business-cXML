@@ -1,5 +1,8 @@
 Revision history for Business-cXML
 
+v0.6.12 2023-12-19
+		API: make extrinsics individually available
+
 v0.6.11 2023-12-13
 		Bugfix: go back to explicit UTF-8; it was Oracle's fault.
 
